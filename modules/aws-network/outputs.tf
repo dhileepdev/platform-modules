@@ -18,6 +18,16 @@ output "private_subnet_ids" {
   value       = aws_subnet.private[*].id
 }
 
+output "public_subnet_cidrs" {
+  description = "Public subnet CIDRs, one per availability zone."
+  value       = aws_subnet.public[*].cidr_block
+}
+
+output "private_subnet_cidrs" {
+  description = "Private subnet CIDRs, one per availability zone."
+  value       = aws_subnet.private[*].cidr_block
+}
+
 output "nat_gateway_ids" {
   description = "NAT gateway IDs. One when single_nat_gateway is true, otherwise one per AZ."
   value       = aws_nat_gateway.this[*].id

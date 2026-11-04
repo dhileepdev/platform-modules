@@ -20,13 +20,18 @@ terraform -chdir=examples/aws validate
 
 ## Apply (ceiling 25 minutes)
 
+The observability module is wired to the EKS cluster through module outputs, so the first apply cannot create the Helm release before the cluster exists. Apply in two stages:
+
 ```bash
+time terraform -chdir=examples/aws apply -auto-approve -target=module.eks
 time terraform -chdir=examples/aws apply -auto-approve
 ```
 
 Expected: one VPC, two private and two public subnets, one NAT gateway, one EKS 1.33 cluster, two `t3.small` nodes, one GitHub OIDC provider and role, kube-prometheus-stack in `monitoring`.
 
-The apply is the long step (roughly 18–22 minutes). If it has not finished at 25 minutes, press on to the demo only if the cluster is healthy; otherwise destroy.
+The apply is the long step (roughly 20–25 minutes, an estimate not yet measured against a real account). If it has not finished at 25 minutes, press on to the demo only if the cluster is healthy; otherwise destroy.
+
+The two-stage apply above is the ceiling on a single run: the first targeted apply creates the EKS cluster, the second creates the OIDC role, the load-generator/observability wiring and everything that depends on cluster outputs.
 
 ## Demo (about 10 minutes)
 

@@ -25,7 +25,7 @@ validate: ## Validate every example (no cloud credentials needed)
 		terraform -chdir="$$d" validate || exit 1; \
 	done
 
-up: ## Create the local kind + LocalStack demo environment
+up: ## Create the local kind + Floci demo environment
 	terraform -chdir=examples/local init -upgrade -input=false
 	terraform -chdir=examples/local apply -auto-approve -target=module.kind
 	terraform -chdir=examples/local apply -auto-approve
@@ -35,6 +35,7 @@ down: ## Destroy the local demo environment
 
 up-aws: ## Create the timeboxed real-AWS demo (needs AWS_PROFILE and TF_VAR_caller_cidr)
 	terraform -chdir=examples/aws init -upgrade -input=false
+	terraform -chdir=examples/aws apply -auto-approve -target=module.eks
 	terraform -chdir=examples/aws apply -auto-approve
 
 down-aws: ## Destroy the real-AWS demo

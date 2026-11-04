@@ -87,8 +87,8 @@ variable "master_ipv4_cidr_block" {
   default     = "172.16.0.0/28"
 
   validation {
-    condition     = can(cidrnetmask(var.master_ipv4_cidr_block))
-    error_message = "master_ipv4_cidr_block must be a valid IPv4 CIDR."
+    condition     = can(cidrnetmask(var.master_ipv4_cidr_block)) && tonumber(split("/", var.master_ipv4_cidr_block)[1]) == 28
+    error_message = "master_ipv4_cidr_block must be a valid IPv4 CIDR with a /28 prefix."
   }
 }
 

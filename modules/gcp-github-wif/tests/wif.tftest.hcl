@@ -21,3 +21,15 @@ run "provider_path" {
     error_message = "WIF provider path contract"
   }
 }
+
+run "rejects_branch_namespace_wildcard" {
+  command = plan
+  variables {
+    name_prefix  = "gha"
+    project_id   = "example-project"
+    github_org   = "dhileepdev"
+    github_repo  = "secure-delivery"
+    allowed_refs = ["refs/heads/*"]
+  }
+  expect_failures = [var.allowed_refs]
+}

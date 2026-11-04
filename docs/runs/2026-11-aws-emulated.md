@@ -6,7 +6,7 @@
 
 ## Why not a real AWS account
 
-The only available account (`612640997769`) has an SCP (`p-hwe3zqb7`) that denies `eks:ListClusters` in every region; `ap-south-1`, `us-east-1`, `us-west-2` and `eu-west-1` were all tested. A real EKS run cannot be created there, so the run was moved to Floci and the real runbook stays in `docs/runbooks/aws-demo.md` for an account that allows EKS.
+The only available account has an SCP (`p-<redacted>`) that denies `eks:ListClusters` in every region; `ap-south-1`, `us-east-1`, `us-west-2` and `eu-west-1` were all tested. A real EKS run cannot be created there, so the run was moved to Floci and the real runbook stays in `docs/runbooks/aws-demo.md` for an account that allows EKS.
 
 ## AWS: `make up-aws-emulated`
 

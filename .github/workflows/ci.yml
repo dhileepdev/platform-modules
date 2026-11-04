@@ -62,3 +62,6 @@ jobs:
       - run: make up
       - run: bash scripts/test-local.sh platform-local
       - run: make down
+      - name: teardown check
+        if: always()
+        run: bash scripts/test-teardown.sh platform-local

@@ -40,9 +40,9 @@ variable "allowed_refs" {
   validation {
     condition = alltrue([
       for ref in var.allowed_refs :
-      ref != "*" && can(regex("^refs/(heads|tags|pull)/.+$", ref))
+      ref != "*" && !endswith(ref, "/*") && can(regex("^refs/(heads|tags|pull)/.+$", ref))
     ])
-    error_message = "Every entry must look like refs/heads/<branch>, refs/tags/<tag> or refs/pull/<id>; the bare wildcard \"*\" is not allowed."
+    error_message = "Every entry must look like refs/heads/<branch>, refs/tags/<tag> or refs/pull/<id>; the bare wildcard \"*\" and branch-namespace wildcards like refs/heads/* are not allowed."
   }
 }
 

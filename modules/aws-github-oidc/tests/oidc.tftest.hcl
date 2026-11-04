@@ -50,3 +50,14 @@ run "rejects_wildcard_ref" {
   }
   expect_failures = [var.allowed_refs]
 }
+
+run "rejects_branch_namespace_wildcard" {
+  command = plan
+  variables {
+    name_prefix  = "gha"
+    github_org   = "dhileepdev"
+    github_repo  = "secure-delivery"
+    allowed_refs = ["refs/heads/*"]
+  }
+  expect_failures = [var.allowed_refs]
+}

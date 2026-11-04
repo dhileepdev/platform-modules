@@ -42,6 +42,24 @@ run "one_az_tight_cidr" {
   }
 }
 
+run "three_az_distinct_cidrs" {
+  command = plan
+  variables {
+    name_prefix        = "multi"
+    vpc_cidr           = "10.42.0.0/21"
+    az_count           = 3
+    single_nat_gateway = true
+  }
+  assert {
+    condition     = length(output.public_subnet_cidrs) == 3 && length(output.private_subnet_cidrs) == 3
+    error_message = "three AZs must yield three CIDRs per tier"
+  }
+  assert {
+    condition     = length(distinct(output.public_subnet_cidrs)) == 3 && length(distinct(output.private_subnet_cidrs)) == 3
+    error_message = "three AZs must yield distinct subnet CIDRs"
+  }
+}
+
 run "rejects_bad_cidr" {
   command = plan
   variables {

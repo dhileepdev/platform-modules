@@ -83,9 +83,9 @@ variable "allowed_refs" {
   validation {
     condition = alltrue([
       for ref in var.allowed_refs :
-      ref != "*" && can(regex("^refs/(heads|tags|pull)/.+$", ref))
+      ref != "*" && !endswith(ref, "/*") && can(regex("^refs/(heads|tags|pull)/.+$", ref))
     ])
-    error_message = "Every entry must look like refs/heads/<branch>, refs/tags/<tag> or refs/pull/<id>; the bare wildcard \"*\" is not allowed."
+    error_message = "Every entry must look like refs/heads/<branch>, refs/tags/<tag> or refs/pull/<id>; the bare wildcard \"*\" and branch-namespace wildcards like refs/heads/* are not allowed."
   }
 }
 
@@ -100,7 +100,7 @@ variable "roles" {
   }
 
   validation {
-    condition     = alltrue([for role in var.roles : can(regex("^roles/[a-zA-Z0-9_]+$", role))])
-    error_message = "Every role must look like roles/<name>."
+    condition     = alltrue([for role in var.roles : can(regex("^roles/[a-zA-Z0-9_.]+$", role))])
+    error_message = "Every role must look like roles/<name>, e.g. roles/viewer or roles/container.admin."
   }
 }

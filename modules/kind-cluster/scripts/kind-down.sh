@@ -3,4 +3,4 @@ set -euo pipefail
 
 NAME="$1"
 
-kind delete cluster --name "$NAME" >/dev/null 2>&1 || true
+kind delete cluster --name "$NAME" >/dev/null 2>&1

@@ -2,20 +2,20 @@
 
 Reusable Terraform modules for AWS and GCP platforms, plus three examples that compose them: a free local stack (kind + Floci), an emulated AWS stack, and a GCP stack whose network layer runs against the Floci GCP emulator.
 
-Every module takes cloud, region, account and naming values as inputs. There are no account IDs, regions, ARNs or backends inside `modules/`; the caller owns providers and state.
+Every module takes cloud, region, account and naming values as inputs. There are no account IDs, regions or backends in module code; tests use fixed fixture values. The caller owns providers and state.
 
 ## Modules
 
 | Module | Cloud | What it creates | Key inputs | Outputs |
 | --- | --- | --- | --- | --- |
-| [`aws-network`](modules/aws-network) | AWS | VPC, public and private `/24` subnets, NAT gateway(s), route tables, optional flow logs | `name_prefix`, `vpc_cidr`, `az_count`, `single_nat_gateway` | `vpc_id`, `public_subnet_ids`, `private_subnet_ids`, `nat_gateway_ids`, `flow_log_group_name` |
+| [`aws-network`](modules/aws-network) | AWS | VPC, public and private `/24` subnets, NAT gateway(s), route tables, optional flow logs | `name_prefix`, `vpc_cidr`, `az_count`, `single_nat_gateway` | `vpc_id`, `vpc_cidr`, `public_subnet_ids`, `private_subnet_ids`, `nat_gateway_ids`, `flow_log_group_name` |
 | [`gcp-network`](modules/gcp-network) | GCP | VPC, one subnet per region, flow logs, default deny ingress | `name_prefix`, `project_id`, `subnet_cidrs` | `network_id`, `subnet_ids`, `subnet_names` |
 | [`kind-cluster`](modules/kind-cluster) | Local | kind cluster via `terraform_data` | `name_prefix`, `node_count` | `cluster_name`, `context` |
 | [`eks-cluster`](modules/eks-cluster) | AWS | EKS 1.33 cluster, managed node group, IRSA OIDC provider, control-plane audit logs | `name_prefix`, `cluster_version`, `subnet_ids`, `public_access_cidrs` | `cluster_name`, `cluster_endpoint`, `cluster_ca_certificate`, `oidc_issuer_url`, `node_group_name` |
 | [`gke-cluster`](modules/gke-cluster) | GCP | Regional GKE cluster, node pool, workload identity | `name_prefix`, `project_id`, `region`, `network_id` | `cluster_name`, `cluster_endpoint`, `ca_certificate`, `workload_identity_pool` |
 | [`aws-github-oidc`](modules/aws-github-oidc) | AWS | GitHub OIDC provider, ref-scoped role, inline `sts:GetCallerIdentity` | `name_prefix`, `github_org`, `github_repo`, `allowed_refs` | `role_arn`, `role_name`, `oidc_provider_arn`, `trust_policy_json` |
 | [`gcp-github-wif`](modules/gcp-github-wif) | GCP | Workload identity pool, OIDC provider, deployer service account | `name_prefix`, `project_id`, `github_org`, `github_repo`, `allowed_refs` | `service_account_email`, `workload_identity_provider` |
-| [`observability`](modules/observability) | Kubernetes | kube-prometheus-stack with SLO recording and burn-rate rules | `namespace`, `slos`, `prometheus_retention` | `namespace`, `grafana_service`, `prometheus_service`, `slo_rules_yaml` |
+| [`observability`](modules/observability) | Kubernetes | kube-prometheus-stack with SLO recording and error-budget rules | `namespace`, `slos`, `prometheus_retention` | `namespace`, `grafana_service`, `prometheus_service`, `slo_rules_yaml` |
 
 ## Composition
 
@@ -66,14 +66,14 @@ The recorded run is in [`docs/runs/2026-11-aws-emulated.md`](docs/runs/2026-11-a
 
 | Concern | Local (free) | Mock (`terraform test`) | Real cloud (manual) |
 | --- | --- | --- | --- |
-| network (AWS) | Floci apply | yes | apply + destroy |
+| network (AWS) | Floci apply | yes | apply + destroy (runbook only, not run) |
 | network (GCP) | Floci apply (compute) | yes | documented, not run |
 | cluster kind | apply | — | — |
 | cluster EKS | — | yes | apply + destroy (60-minute window) |
 | cluster GKE | — | yes | documented, not run |
-| identity + OIDC (AWS) | Floci apply | yes | bootstrap once, reused |
+| identity + OIDC (AWS) | Floci apply | yes | runbook only, not run |
 | identity + WIF (GCP) | — | yes | documented, not run |
-| observability | apply on kind | yes | apply on EKS |
+| observability | apply on kind | yes | planned, not run |
 
 `make test` runs every module's suite with mocked providers and no credentials. `make lint` runs `terraform fmt -check` and `tflint`.
 
@@ -113,7 +113,7 @@ scripts/        local smoke test and AWS resource verification
 
 - [ADR 0001: three focused repositories](docs/adr/0001-three-repos.md)
 - [ADR 0002: local emulator boundary](docs/adr/0002-local-emulator-boundary.md)
-- [ADR 0003: GCP is mock-tested, never applied](docs/adr/0003-gcp-not-applied.md)
+- [ADR 0003: GCP is mock-tested, network emulated](docs/adr/0003-gcp-not-applied.md)
 
 ## License
 

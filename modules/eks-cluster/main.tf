@@ -5,7 +5,7 @@ locals {
   node_role_name    = "${var.name_prefix}-eks-nodes"
   node_group_name   = "${var.name_prefix}-nodes"
 
-  # Well-known thumbprint for the GitHub/Amazon OIDC roots used by EKS IRSA.
+  # Well-known OIDC thumbprint for the EKS control plane used by IRSA.
   oidc_thumbprint = "9e99a48a9960b14926bb7f3b02e22da2b0ab7280"
 }
 

@@ -1,4 +1,4 @@
-# ADR 0003: GCP is mock-tested, never applied
+# ADR 0003: GCP is mock-tested, network emulated
 
 - Status: accepted
 - Date: 2026-11-04
