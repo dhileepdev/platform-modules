@@ -33,3 +33,20 @@ jobs:
         with:
           terraform_version: "1.17.1"
       - run: make test
+
+  e2e-local:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3
+        with:
+          terraform_version: "1.17.1"
+      - uses: helm/kind-action@0b5c88445f37b7e12a2ce1ecca7805b9046a74db # v1
+        with:
+          install_only: true
+      - run: make up
+      - run: bash scripts/test-local.sh platform-local
+      - run: make down

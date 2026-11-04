@@ -12,6 +12,7 @@ override.tf.json
 
 # Local demo scratch
 examples/**/.generated/
+modules/**/.generated/
 *.kubeconfig
 
 # Superpowers workspace

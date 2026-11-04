@@ -20,6 +20,7 @@ test: ## Run terraform test for every module
 
 up: ## Create the local kind + LocalStack demo environment
 	terraform -chdir=examples/local init -upgrade -input=false
+	terraform -chdir=examples/local apply -auto-approve -target=module.kind
 	terraform -chdir=examples/local apply -auto-approve
 
 down: ## Destroy the local demo environment

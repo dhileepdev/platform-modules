@@ -40,9 +40,3 @@ variable "enable_flow_logs" {
   type        = bool
   default     = true
 }
-
-variable "labels" {
-  description = "Labels applied to every labellable resource."
-  type        = map(string)
-  default     = {}
-}
