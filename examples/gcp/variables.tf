@@ -32,3 +32,9 @@ variable "github_repo" {
   type        = string
   default     = "secure-delivery"
 }
+
+variable "emulator_endpoint" {
+  description = "Floci GCP endpoint such as http://localhost:4588. Null uses real GCP."
+  type        = string
+  default     = null
+}

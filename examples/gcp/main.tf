@@ -1,6 +1,10 @@
 provider "google" {
   project = var.project_id
   region  = var.region
+
+  access_token = var.emulator_endpoint == null ? null : "fake"
+
+  compute_custom_endpoint = var.emulator_endpoint == null ? null : "${var.emulator_endpoint}/compute/v1/"
 }
 
 module "network" {

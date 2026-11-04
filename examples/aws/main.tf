@@ -1,6 +1,22 @@
 provider "aws" {
   region = var.region
 
+  access_key                  = var.aws_endpoint_url == null ? null : "test"
+  secret_key                  = var.aws_endpoint_url == null ? null : "test"
+  skip_credentials_validation = var.aws_endpoint_url != null
+  skip_metadata_api_check     = var.aws_endpoint_url != null
+  skip_requesting_account_id  = var.aws_endpoint_url != null
+
+  endpoints {
+    iam                  = var.aws_endpoint_url
+    sts                  = var.aws_endpoint_url
+    ec2                  = var.aws_endpoint_url
+    eks                  = var.aws_endpoint_url
+    logs                 = var.aws_endpoint_url
+    elbv2                = var.aws_endpoint_url
+    elasticloadbalancing = var.aws_endpoint_url
+  }
+
   default_tags {
     tags = {
       Project   = "platform-modules"

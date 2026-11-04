@@ -17,8 +17,8 @@ provider "helm" {
   }
 }
 
-# LocalStack stands in for IAM and STS only. Credentials are the documented
-# LocalStack dummy values, never real ones.
+# Floci stands in for IAM and STS only. Credentials are the documented
+# Floci dummy values, never real ones.
 provider "aws" {
   region                      = "us-east-1"
   access_key                  = "test"

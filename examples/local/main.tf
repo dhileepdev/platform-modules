@@ -27,7 +27,7 @@ module "github_oidc" {
   github_repo  = "secure-delivery"
   allowed_refs = ["refs/heads/main"]
 
-  depends_on = [docker_container.localstack]
+  depends_on = [docker_container.floci]
 }
 
 resource "kubernetes_deployment_v1" "placeholder" {

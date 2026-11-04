@@ -1,6 +1,13 @@
 # GCP example
 
-This example is mock-tested and has never been applied. `gcloud` is installed, but no GCP project or billing account was available, and no GCP resource was created. The configuration is complete; treat it as a reviewed starting point.
+The network layer of this example runs against the Floci GCP emulator; the GKE and workload-identity layers have never been applied anywhere. `gcloud` is installed, but no GCP project or billing account was available. The configuration is complete; treat the cluster and identity parts as a reviewed starting point.
+
+```bash
+make up-gcp-emulated    # applies only module.network to Floci on :4588
+make down-gcp-emulated
+```
+
+GKE creation against the emulator fails with `clusterId query parameter is required`, and service-account creation fails with `CREDENTIALS_MISSING`; that is why only the network is in the emulated target.
 
 It wires `gcp-network` → `gke-cluster` → `gcp-github-wif` → `observability` with the same modules the local and AWS examples use.
 

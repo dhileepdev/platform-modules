@@ -1,6 +1,6 @@
 # platform-modules
 
-Reusable Terraform modules for AWS and GCP platforms, plus three examples that compose them: a free local stack (kind + LocalStack), a timeboxed AWS stack, and a plan-only GCP stack.
+Reusable Terraform modules for AWS and GCP platforms, plus three examples that compose them: a free local stack (kind + Floci), an emulated AWS stack, and a GCP stack whose network layer runs against the Floci GCP emulator.
 
 Every module takes cloud, region, account and naming values as inputs. There are no account IDs, regions, ARNs or backends inside `modules/`; the caller owns providers and state.
 
@@ -23,7 +23,7 @@ Every module takes cloud, region, account and naming values as inputs. There are
 flowchart LR
   subgraph local["examples/local — free, CI"]
     LK[kind-cluster] --> LO[observability]
-    LS[LocalStack] --> LA[aws-github-oidc]
+    LF[Floci AWS] --> LA[aws-github-oidc]
   end
 
   subgraph aws["examples/aws — timeboxed, manual"]
@@ -32,7 +32,7 @@ flowchart LR
     EK --> OBS[observability]
   end
 
-  subgraph gcp["examples/gcp — validate only"]
+  subgraph gcp["examples/gcp — network emulated, cluster mock-tested"]
     GN[gcp-network] --> GK[gke-cluster]
     GW[gcp-github-wif] --> GK
     GK --> OBS2[observability]
@@ -41,7 +41,7 @@ flowchart LR
 
 ## Quickstart (local, no cloud account)
 
-Requires Docker, `kind`, `kubectl`, and Terraform ≥ 1.9.
+Requires Docker, `kind`, `kubectl`, AWS CLI v2, and Terraform ≥ 1.9.
 
 ```bash
 make up
@@ -49,18 +49,29 @@ bash scripts/test-local.sh platform-local
 make down
 ```
 
-`make up` creates a kind cluster, a LocalStack container, the placeholder workload, kube-prometheus-stack, and a GitHub OIDC role. `make down` removes all of it.
+`make up` creates a kind cluster, a Floci AWS container, the placeholder workload, kube-prometheus-stack, and a GitHub OIDC role. `make down` removes all of it.
+
+Emulated cloud runs, no account needed:
+
+```bash
+make up-aws-emulated    # VPC + flow logs + OIDC role against Floci on :4567
+make down-aws-emulated
+make up-gcp-emulated    # VPC + subnet + firewall against Floci GCP on :4588
+make down-gcp-emulated
+```
+
+The recorded run is in [`docs/runs/2026-11-aws-emulated.md`](docs/runs/2026-11-aws-emulated.md).
 
 ## Test matrix
 
 | Concern | Local (free) | Mock (`terraform test`) | Real cloud (manual) |
 | --- | --- | --- | --- |
-| network (AWS) | plan only | yes | apply + destroy |
-| network (GCP) | plan only | yes | documented, not run |
+| network (AWS) | Floci apply | yes | apply + destroy |
+| network (GCP) | Floci apply (compute) | yes | documented, not run |
 | cluster kind | apply | — | — |
 | cluster EKS | — | yes | apply + destroy (60-minute window) |
 | cluster GKE | — | yes | documented, not run |
-| identity + OIDC (AWS) | LocalStack apply | yes | bootstrap once, reused |
+| identity + OIDC (AWS) | Floci apply | yes | bootstrap once, reused |
 | identity + WIF (GCP) | — | yes | documented, not run |
 | observability | apply on kind | yes | apply on EKS |
 
@@ -68,20 +79,20 @@ make down
 
 ## Real AWS run
 
-`docs/runbooks/aws-demo.md` is the 60-minute runbook: pre-flight, a 25-minute apply ceiling, demo checks, destroy, and `scripts/verify-no-aws-resources.sh` to prove nothing was left behind. The recorded run lives in `docs/runs/` once it has happened.
+`docs/runbooks/aws-demo.md` is the 60-minute runbook for a real account: pre-flight, a 25-minute apply ceiling, demo checks, destroy, and `scripts/verify-no-aws-resources.sh` to prove nothing was left behind. The emulated run that was actually executed is in [`docs/runs/2026-11-aws-emulated.md`](docs/runs/2026-11-aws-emulated.md).
 
 ## Limitations, stated openly
 
-- LocalStack community stands in for IAM and STS only. VPC and EKS are Pro features; the AWS network and cluster are mock-tested, not applied locally. See [ADR 0002](docs/adr/0002-localstack-test-boundary.md).
-- GCP is mock-tested and has never been applied; no project was available. See [ADR 0003](docs/adr/0003-gcp-not-applied.md) and `examples/gcp/README.md`.
-- The AWS demo is timeboxed and destroyed in the same window; it is not a running service.
+- Floci stands in for AWS locally (IAM, STS, and the emulated VPC/EKS APIs). A local pass is evidence about the Terraform graph and policies, not proof that a real account accepts them. See [ADR 0002](docs/adr/0002-local-emulator-boundary.md).
+- GCP has no real run: `gcp-network` applies against the Floci GCP emulator, while `gke-cluster` and `gcp-github-wif` are mock-tested only. See [ADR 0003](docs/adr/0003-gcp-not-applied.md) and `examples/gcp/README.md`.
+- The AWS run recorded here is emulated because the available account denies EKS; the real runbook is kept for an account that allows it. It is not a running service.
 - CI runs with no cloud credentials. Anything that needs a real account is a manual step with a linked record.
 
 ## Repository layout
 
 ```text
 modules/        one directory per module, each with tests/
-examples/local/ kind + LocalStack (make up / make down)
+examples/local/ kind + Floci AWS (make up / make down)
 examples/aws/   VPC → EKS → OIDC → observability
 examples/gcp/   VPC → GKE → WIF → observability (validate only)
 docs/adr/       decisions, including the testing boundaries
@@ -101,7 +112,7 @@ scripts/        local smoke test and AWS resource verification
 ## Decisions
 
 - [ADR 0001: three focused repositories](docs/adr/0001-three-repos.md)
-- [ADR 0002: LocalStack boundary](docs/adr/0002-localstack-test-boundary.md)
+- [ADR 0002: local emulator boundary](docs/adr/0002-local-emulator-boundary.md)
 - [ADR 0003: GCP is mock-tested, never applied](docs/adr/0003-gcp-not-applied.md)
 
 ## License

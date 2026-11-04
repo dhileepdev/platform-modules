@@ -25,3 +25,9 @@ variable "caller_cidr" {
     error_message = "caller_cidr must be a single host /32."
   }
 }
+
+variable "aws_endpoint_url" {
+  description = "Local emulator endpoint such as http://localhost:4566. Null uses real AWS."
+  type        = string
+  default     = null
+}
