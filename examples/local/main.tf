@@ -19,6 +19,17 @@ module "observability" {
   depends_on = [module.kind]
 }
 
+module "github_oidc" {
+  source = "../../modules/aws-github-oidc"
+
+  name_prefix  = "gha"
+  github_org   = "dhileepdev"
+  github_repo  = "secure-delivery"
+  allowed_refs = ["refs/heads/main"]
+
+  depends_on = [docker_container.localstack]
+}
+
 resource "kubernetes_deployment_v1" "placeholder" {
   metadata {
     name      = "placeholder"

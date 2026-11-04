@@ -9,5 +9,13 @@ terraform {
       source  = "hashicorp/helm"
       version = ">= 3.0"
     }
+    docker = {
+      source  = "kreuzwerker/docker"
+      version = ">= 3.0"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = ">= 6.0"
+    }
   }
 }
