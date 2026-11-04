@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help fmt lint test up down up-aws down-aws
+.PHONY: help fmt lint test validate up down up-aws down-aws
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-8s %s\n", $$1, $$2}'
@@ -16,6 +16,13 @@ test: ## Run terraform test for every module
 		echo "== $$d"; \
 		terraform -chdir="$$d" init -backend=false -input=false >/dev/null; \
 		terraform -chdir="$$d" test || exit 1; \
+	done
+
+validate: ## Validate every example (no cloud credentials needed)
+	@for d in examples/local examples/aws examples/gcp; do \
+		echo "== $$d"; \
+		terraform -chdir="$$d" init -backend=false -input=false >/dev/null; \
+		terraform -chdir="$$d" validate || exit 1; \
 	done
 
 up: ## Create the local kind + LocalStack demo environment
