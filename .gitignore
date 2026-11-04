@@ -1,0 +1,18 @@
+# Terraform
+.terraform/
+modules/**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Local demo scratch
+examples/**/.generated/
+*.kubeconfig
+
+# Superpowers workspace
+.superpowers/
