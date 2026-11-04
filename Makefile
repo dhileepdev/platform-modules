@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help fmt lint test up down
+.PHONY: help fmt lint test up down up-aws down-aws
 
 help: ## Show available targets
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  %-8s %s\n", $$1, $$2}'
@@ -25,3 +25,10 @@ up: ## Create the local kind + LocalStack demo environment
 
 down: ## Destroy the local demo environment
 	terraform -chdir=examples/local destroy -auto-approve
+
+up-aws: ## Create the timeboxed real-AWS demo (needs AWS_PROFILE and TF_VAR_caller_cidr)
+	terraform -chdir=examples/aws init -upgrade -input=false
+	terraform -chdir=examples/aws apply -auto-approve
+
+down-aws: ## Destroy the real-AWS demo
+	terraform -chdir=examples/aws destroy -auto-approve
