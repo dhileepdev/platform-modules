@@ -9,3 +9,10 @@ provider "kubernetes" {
   config_path    = pathexpand("~/.kube/config")
   config_context = module.kind.context
 }
+
+provider "helm" {
+  kubernetes = {
+    config_path    = pathexpand("~/.kube/config")
+    config_context = module.kind.context
+  }
+}

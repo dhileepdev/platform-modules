@@ -6,6 +6,19 @@ resource "kubernetes_namespace_v1" "demo" {
   depends_on = [module.kind]
 }
 
+module "observability" {
+  source = "../../modules/observability"
+
+  namespace = "monitoring"
+
+  slos = [
+    { name = "availability", target = 0.999, window = "28d" },
+    { name = "latency", target = 0.99, window = "7d" },
+  ]
+
+  depends_on = [module.kind]
+}
+
 resource "kubernetes_deployment_v1" "placeholder" {
   metadata {
     name      = "placeholder"
